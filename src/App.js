@@ -203,6 +203,13 @@ class App extends React.Component {
     const isGoogleUrl =
       decodeURIComponent(location.search).indexOf(testLocation) > -1;
 
+
+    console.log("location->", location);
+    console.log("location.search->", location.search);
+    console.log("decoded(location.search)->", decodeURIComponent(location.search))
+    console.log("testLocation->", testLocation);
+    console.log("isGoogleUrl->", isGoogleUrl);
+
     const switchLocation = isGoogleUrl ? serverLocation : location;
 
     const isNdlaFilm = location.pathname.includes(FILM_PAGE_PATH);
