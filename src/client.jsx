@@ -29,9 +29,10 @@ const {
 } = window;
 const { abbreviation, messages, basename } = getLocaleInfoFromPath(serverPath);
 
+const serverQueryString = decodeURIComponent(queryString.stringify(serverQuery));
 const locationFromServer = {
   pathname: serverPath,
-  search: `?${decodeURIComponent(queryString.stringify(serverQuery))}`,
+  search: serverQueryString ? `?${serverQueryString}` : '',
 };
 
 const storedLanguage = getCookie('language', document.cookie);
