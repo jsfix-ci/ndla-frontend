@@ -27,11 +27,15 @@ import './style/index.css';
 const {
   DATA: { initialProps, config, serverPath, serverQuery },
 } = window;
-const { abbreviation, messages, basename } = getLocaleInfoFromPath(serverPath);
+const { abbreviation, messages, basename, basepath } = getLocaleInfoFromPath(
+  serverPath,
+);
 
-const serverQueryString = decodeURIComponent(queryString.stringify(serverQuery));
+const serverQueryString = decodeURIComponent(
+  queryString.stringify(serverQuery),
+);
 const locationFromServer = {
-  pathname: serverPath,
+  pathname: basepath || '/',
   search: serverQueryString ? `?${serverQueryString}` : '',
 };
 
