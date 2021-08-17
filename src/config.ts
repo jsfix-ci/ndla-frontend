@@ -7,10 +7,7 @@
  */
 
 export function getEnvironmentVariabel(key: string, fallback: string): string;
-export function getEnvironmentVariabel(
-  key: string,
-  fallback: boolean,
-): string | boolean;
+export function getEnvironmentVariabel(key: string, fallback: boolean): boolean;
 export function getEnvironmentVariabel(
   key: string,
   fallback?: string,
@@ -78,8 +75,6 @@ const gaTrackingId = (): string => {
       return '';
     case 'prod':
       return 'UA-9036010-1';
-    case 'ff':
-      return 'UA-9036010-1';
     default:
       return 'UA-9036010-31';
   }
@@ -92,9 +87,25 @@ const logglyApiKey = (): string | undefined => {
   return getEnvironmentVariabel('LOGGLY_API_KEY');
 };
 
-export interface ConfigType {
-  [key: string]: string | boolean | undefined;
-}
+export type ConfigType = {
+  componentName: string;
+  ndlaEnvironment: string;
+  host: string;
+  port: string;
+  redirectPort: string;
+  logEnvironment: string;
+  logglyApiKey: string | undefined;
+  disableSSR: boolean;
+  isNdlaProdEnvironment: boolean;
+  ndlaApiUrl: string;
+  ndlaFrontendDomain: string;
+  learningPathDomain: string;
+  googleTagManagerId: string | undefined;
+  gaTrackingId: string | undefined;
+  zendeskWidgetKey: string | undefined;
+  localGraphQLApi: boolean;
+  showAllFrontpageSubjects: boolean;
+};
 
 const config: ConfigType = {
   componentName: 'ndla-frontend',
@@ -106,12 +117,17 @@ const config: ConfigType = {
   logglyApiKey: logglyApiKey(),
   disableSSR: getEnvironmentVariabel('RAZZLE_DISABLE_SSR', false),
   isNdlaProdEnvironment: ndlaEnvironment === 'prod',
-  isFFServer: ndlaEnvironment === 'ff',
   ndlaApiUrl: getEnvironmentVariabel('NDLA_API_URL', apiDomain()),
-  ndlaFrontendDomain: ndlaFrontendDomain(),
-  learningPathDomain: learningPathDomain(),
+  ndlaFrontendDomain: getEnvironmentVariabel(
+    'FRONTEND_DOMAIN',
+    ndlaFrontendDomain(),
+  ),
+  learningPathDomain: getEnvironmentVariabel(
+    'LEARNINGPATH_DOMAIN',
+    learningPathDomain(),
+  ),
   googleTagManagerId: getEnvironmentVariabel('NDLA_GOOGLE_TAG_MANAGER_ID'),
-  gaTrackingId: gaTrackingId(),
+  gaTrackingId: getEnvironmentVariabel('GA_TRACKING_ID', gaTrackingId()),
   zendeskWidgetKey: getEnvironmentVariabel('NDLA_ZENDESK_WIDGET_KEY'),
   localGraphQLApi: getEnvironmentVariabel('LOCAL_GRAPHQL_API', false),
   showAllFrontpageSubjects: true,
