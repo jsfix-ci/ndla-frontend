@@ -29,7 +29,8 @@
     "e2e-ci": "cross-env BABEL_ENV=test CYPRESS_USE_FIXTURES=true cypress run --record --parallel",
     "now-build": "npm run build",
     "now-start": "cross-env NODE_ENV=production NOW=true node build/server | bunyan",
-    "get-gql-schema-local": "apollo schema:download --endpoint=http://localhost:4000/graphql-api/graphql src/gqlSchema.json"
+    "get-gql-schema-local": "apollo schema:download --endpoint=http://localhost:4000/graphql-api/graphql src/gqlSchema.json",
+    "codegen": "apollo codegen:generate --localSchemaFile=src/gqlSchema.json --target=typescript --tagName=gql"
   },
   "jest": {
     "testRegex": "/__tests__/.*-test.(js|jsx|ts|tsx)$",
@@ -98,7 +99,7 @@
     "@ndla/icons": "^1.0.0",
     "@ndla/licenses": "^1.0.0",
     "@ndla/modal": "^1.1.0",
-    "@ndla/notion":"^1.0.2",
+    "@ndla/notion": "^1.0.2",
     "@ndla/pager": "^1.0.0",
     "@ndla/polyfill": "^0.1.15",
     "@ndla/safelink": "^1.0.0",

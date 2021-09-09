@@ -608,7 +608,10 @@ export const subjectTopicsQuery = gql`
 `;
 
 export const topicsQueryWithBreadcrumbs = gql`
-  query topicQuery($contentUri: String, $filterVisible: Boolean) {
+  query topicQueryWithBreadcrumbs(
+    $contentUri: String
+    $filterVisible: Boolean
+  ) {
     topics(contentUri: $contentUri, filterVisible: $filterVisible) {
       ...TopicInfo
       breadcrumbs
@@ -618,7 +621,7 @@ export const topicsQueryWithBreadcrumbs = gql`
 `;
 
 export const subjectPageQueryWithTopics = gql`
-  query subjectPageQuery(
+  query subjectPageQueryWithTopics(
     $subjectId: String!
     $filterIds: String
     $topicId: String!
@@ -821,7 +824,7 @@ export const resourceQuery = gql`
 `;
 
 export const movedResourceQuery = gql`
-  query resourceQuery($resourceId: String!) {
+  query movedResourceQuery($resourceId: String!) {
     resource(id: $resourceId) {
       breadcrumbs
     }
@@ -872,7 +875,7 @@ export const iframeArticleQuery = gql`
 `;
 
 export const topicQueryWithPathTopics = gql`
-  query topicQuery($topicId: String!, $subjectId: String!) {
+  query topicQueryWithPathTopics($topicId: String!, $subjectId: String!) {
     subject(id: $subjectId) {
       id
       name
