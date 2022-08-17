@@ -96,9 +96,9 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
   const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [canSave, setCanSave] = useState<boolean>(false);
-  const [alreadyAdded, setAlreadyAdded] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [selectedFolderId, setSelectedFolderId] = useState<string | undefined>(
-    undefined,
+    'folders',
   );
   const selectedFolder = useFolder(selectedFolderId);
   const { addSnack } = useSnack();
@@ -123,14 +123,14 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
   }, [storedResource]);
 
   useEffect(() => {
-    setAlreadyAdded(false);
+    setErrorMessage(undefined);
     if (selectedFolder) {
       if (
         selectedFolder.resources.some(
           resource => resource.id === storedResource?.id,
         )
       ) {
-        setAlreadyAdded(true);
+        setErrorMessage(t('myNdla.alreadyInFolder'));
         setCanSave(false);
       } else {
         setCanSave(true);
@@ -141,7 +141,7 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
     } else {
       setCanSave(false);
     }
-  }, [storedResource, selectedTags, selectedFolder]);
+  }, [storedResource, selectedTags, selectedFolder, t]);
 
   const shouldUpdateFolderResource = (
     storedResource: GQLFolderResource,
@@ -152,16 +152,15 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
     return !isEqual(sortedStored, sortedSelected);
   };
 
-  const structureFolders: FolderType[] = [
-    {
-      id: 'folders',
-      name: t('myNdla.myFolders'),
-      status: 'private',
-      subfolders: folders,
-      breadcrumbs: [],
-      resources: [],
-    },
-  ];
+  const rootFolder: FolderType = {
+    id: 'folders',
+    name: t('myNdla.myFolders'),
+    status: 'private',
+    subfolders: folders,
+    breadcrumbs: [],
+    resources: [],
+  };
+
   const { addFolder } = useAddFolderMutation();
   const { updateFolderResource } = useUpdateFolderResourceMutation();
   const { addResourceToFolder } = useAddResourceToFolderMutation(
@@ -199,13 +198,27 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
   };
 
   const onAddNewFolder = async (name: string, parentId: string) => {
-    const res = await addFolder({
+    const targetFolder =
+      selectedFolder || (selectedFolderId === 'folders' ? rootFolder : null);
+    const alreadyExists = targetFolder?.subfolders.some(
+      folder => folder.name === name,
+    );
+    if (alreadyExists) {
+      setErrorMessage(t('myNdla.folder.duplicateFolder', { folderName: name }));
+      return undefined;
+    }
+
+    return addFolder({
       variables: {
         name,
         parentId: parentId !== 'folders' ? parentId : undefined,
       },
-    });
-    return res.data!.addFolder;
+    })
+      .then(data => data.data?.addFolder || undefined)
+      .catch(e => {
+        setErrorMessage(t('errorMessage.description'));
+        return undefined;
+      });
   };
 
   return (
@@ -223,7 +236,8 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
         }}
       />
       <TreeStructure
-        folders={structureFolders}
+        loading={loading}
+        folders={[rootFolder]}
         label={t('myNdla.myFolders')}
         onNewFolder={onAddNewFolder}
         onSelectFolder={setSelectedFolderId}
@@ -232,9 +246,7 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
         editable
         targetResource={storedResource}
       />
-      {alreadyAdded && (
-        <MessageBox type="danger">{t('myNdla.alreadyInFolder')}</MessageBox>
-      )}
+      {errorMessage && <MessageBox type="danger">{errorMessage}</MessageBox>}
       <TagSelector
         prefix="#"
         label={t('myNdla.myTags')}
