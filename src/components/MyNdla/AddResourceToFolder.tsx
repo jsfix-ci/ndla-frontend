@@ -6,7 +6,7 @@
  *
  */
 
-import { compact, isEqual, sortBy, uniq } from 'lodash';
+import { compact, isEqual, sortBy } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from '@emotion/styled';
@@ -55,7 +55,7 @@ const AddResourceContainer = styled.div`
   gap: ${spacing.normal};
 `;
 
-const TreestructureContainer = styled.div`
+const ComboboxContainer = styled.div`
   display: flex;
   max-height: 320px;
   overflow: hidden;
@@ -111,7 +111,9 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
   const [storedResource, setStoredResource] = useState<
     GQLFolderResource | undefined
   >(undefined);
-  const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
+  const [tags, setTags] = useState<readonly { label: string; value: string }[]>(
+    [],
+  );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [alreadyAdded, setAlreadyAdded] = useState(false);
@@ -128,7 +130,9 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
       setSelectedTags(_storedResource?.tags ?? []);
       setTags(tags =>
         compact(
-          tags.concat(getAllTags(folders).map(t => ({ id: t, name: t }))),
+          tags.concat(
+            getAllTags(folders).map(tag => ({ label: tag, value: tag })),
+          ),
         ),
       );
     }
@@ -241,7 +245,7 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
           alt: meta?.metaImage?.alt ?? '',
         }}
       />
-      <TreestructureContainer>
+      <ComboboxContainer>
         <TreeStructure
           folders={structureFolders}
           label={t('myNdla.myFolders')}
@@ -257,29 +261,18 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
             />
           )}
         />
-      </TreestructureContainer>
+      </ComboboxContainer>
       {alreadyAdded && (
         <MessageBox type="danger">{t('myNdla.alreadyInFolder')}</MessageBox>
       )}
-      <TagSelector
-        prefix="#"
-        label={t('myNdla.myTags')}
-        tagsSelected={selectedTags}
-        tags={tags}
-        onToggleTag={tag => {
-          if (selectedTags.some(t => t === tag)) {
-            setSelectedTags(prev => prev.filter(t => t !== tag));
-            return;
-          }
-          setSelectedTags(prev => uniq(prev.concat(tag)));
-        }}
-        onCreateTag={tag => {
-          if (!tags.some(t => t.id === tag)) {
-            setTags(prev => prev.concat({ id: tag, name: tag }));
-          }
-          setSelectedTags(prev => uniq(prev.concat(tag)));
-        }}
-      />
+      <ComboboxContainer>
+        <TagSelector
+          label={t('myNdla.myTags')}
+          selected={selectedTags.map(tag => ({ label: tag, value: tag }))}
+          tags={tags}
+          onChange={updated => setSelectedTags(updated.map(tag => tag.value))}
+        />
+      </ComboboxContainer>
       <ButtonRow>
         <Button
           variant="outline"
