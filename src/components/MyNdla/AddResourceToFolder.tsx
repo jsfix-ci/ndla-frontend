@@ -6,7 +6,7 @@
  *
  */
 
-import { compact, isEqual, sortBy } from 'lodash';
+import { compact, isEqual, sortBy, uniq } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from '@emotion/styled';
@@ -271,6 +271,12 @@ const AddResourceToFolder = ({ onClose, resource }: Props) => {
           selected={selectedTags.map(tag => ({ label: tag, value: tag }))}
           tags={tags}
           onChange={updated => setSelectedTags(updated.map(tag => tag.value))}
+          onCreateTag={tag => {
+            if (!tags.some(t => t.id === tag)) {
+              setTags(prev => prev.concat({ value: tag, label: tag }));
+            }
+            setSelectedTags(prev => uniq(prev.concat(tag)));
+          }}
         />
       </ComboboxContainer>
       <ButtonRow>
