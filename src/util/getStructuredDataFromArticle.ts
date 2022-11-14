@@ -235,8 +235,14 @@ const getStructuredDataFromArticle = (
     name: article.title,
     headline: article.title,
     abstract: article.metaDescription,
-    datePublished: format(article.published, 'YYYY-MM-DD'),
-    dateModified: format(article.updated, 'YYYY-MM-DD'),
+    datePublished: /* TODO: JSFIX could not patch the breaking change:
+    now functions don't accept string arguments, but only numbers or dates.  
+    Suggested fix: The input string should now be parsed beforehand. Use parse or parseISO (if you’re using ISO 8601) to parse your strings. */
+    format(article.published, 'YYYY-MM-DD'),
+    dateModified: /* TODO: JSFIX could not patch the breaking change:
+    now functions don't accept string arguments, but only numbers or dates.  
+    Suggested fix: The input string should now be parsed beforehand. Use parse or parseISO (if you’re using ISO 8601) to parse your strings. */
+    format(article.updated, 'YYYY-MM-DD'),
     image: article.metaImage?.url,
     ...publisher,
     ...getCopyrightData(article.copyright),
@@ -306,7 +312,10 @@ const createVideoData = (
       thumbnailUrl: video?.cover,
       description: video?.description,
       acquireLicensePage: AcquireLicensePage,
-      uploadDate: format(video?.uploadDate!, 'YYYY-MM-DD'),
+      uploadDate: /* TODO: JSFIX could not patch the breaking change:
+      now functions don't accept string arguments, but only numbers or dates.  
+      Suggested fix: The input string should now be parsed beforehand. Use parse or parseISO (if you’re using ISO 8601) to parse your strings. */
+      format(video?.uploadDate!, 'YYYY-MM-DD'),
       ...getCopyrightData(video?.copyright!),
     };
   });
